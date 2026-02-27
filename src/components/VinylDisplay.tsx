@@ -6,7 +6,7 @@ import AudioVisualizer from "./AudioVisualizer";
 import { Disc } from "lucide-react";
 
 // Vinyl record component with CSS animation
-function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: boolean; coverArt?: string | null; title?: string; trackNumber?: number }) {
+function VinylRecord({ isPlaying, coverArt, title, trackNumber, isLarge }: { isPlaying: boolean; coverArt?: string | null; title?: string; trackNumber?: number; isLarge?: boolean }) {
     return (
         <div
             style={{
@@ -16,15 +16,15 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "20px",
+                padding: isLarge ? "0" : "20px", // Remove padding in large mode to let it bleed out
             }}
         >
             {/* Outer ring glow */}
             <div
                 style={{
                     position: "absolute",
-                    width: "85%",
-                    height: "85%",
+                    width: isLarge ? "95%" : "85%",
+                    height: isLarge ? "95%" : "85%",
                     borderRadius: "50%",
                     background: "radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 75%)",
                     transition: "opacity 1s ease",
@@ -38,7 +38,7 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                 style={{
                     width: "100%",
                     aspectRatio: "1/1",
-                    maxWidth: "360px",
+                    maxWidth: isLarge ? "min(95vh, 600px)" : "360px",
                     borderRadius: "50%",
                     background: coverArt ? `url('${coverArt}') center/cover no-repeat` : "#050505",
                     boxShadow: `
@@ -187,7 +187,7 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
     );
 }
 
-export default function VinylDisplay() {
+export default function VinylDisplay({ isLarge = false }: { isLarge?: boolean }) {
     const { currentTrack, state } = useAudio();
     const [vizMode, setVizMode] = useState<"bars" | "wave" | "circle">("bars");
 
@@ -199,78 +199,93 @@ export default function VinylDisplay() {
                 height: "100%",
                 gap: "1.5rem",
                 userSelect: "none",
-                paddingBottom: "1rem"
+                paddingBottom: isLarge ? "0" : "1rem",
+                justifyContent: isLarge ? "center" : "flex-start",
             }}
         >
             {/* Main Vinyl Area */}
-            <div style={{ flex: "1 1 0", minHeight: "380px", position: "relative" }}>
-                <VinylRecord
-                    isPlaying={state.isPlaying}
-                    coverArt={currentTrack?.coverArt}
-                    title={currentTrack?.title}
-                    trackNumber={currentTrack?.trackNumber}
-                />
+            <div style={{ flex: isLarge ? "none" : "1 1 0", minHeight: isLarge ? "auto" : "380px", position: "relative", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {/* Circle Visualizer behind the vinyl */}
+                {vizMode === "circle" && (
+                    <div style={{ position: "absolute", inset: isLarge ? "-10%" : "-20%", pointerEvents: "none", zIndex: 0 }}>
+                        <AudioVisualizer width={isLarge ? 800 : 500} height={isLarge ? 800 : 500} style="circle" className="w-full h-full" />
+                    </div>
+                )}
+
+                <div style={{ position: "relative", zIndex: 1, width: "100%" }}>
+                    <VinylRecord
+                        isPlaying={state.isPlaying}
+                        coverArt={currentTrack?.coverArt}
+                        title={currentTrack?.title}
+                        trackNumber={currentTrack?.trackNumber}
+                        isLarge={isLarge}
+                    />
+                </div>
             </div>
 
             {/* Visualizer & Info Section */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", background: "rgba(12,12,12,0.4)", padding: "1.5rem", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.05)" }}>
-                {/* Visualizer Mode Controls */}
-                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", position: "relative", zIndex: 50 }}>
-                    {(["bars", "wave", "circle"] as const).map((mode) => (
-                        <button
-                            key={mode}
-                            onClick={() => {
-                                console.log("viz mode clicked:", mode);
-                                setVizMode(mode);
-                            }}
-                            style={{
-                                background: vizMode === mode ? "rgba(201, 168, 76, 0.2)" : "transparent",
-                                border: `1px solid ${vizMode === mode ? "rgba(201, 168, 76, 0.4)" : "rgba(201, 168, 76, 0.1)"}`,
-                                color: vizMode === mode ? "var(--gold)" : "var(--text-muted)",
-                                padding: "0.25rem 0.75rem",
-                                fontSize: "0.6rem",
-                                letterSpacing: "0.2em",
-                                textTransform: "uppercase",
-                                cursor: "pointer",
-                                transition: "all 0.2s",
-                                borderRadius: "2px",
-                                fontFamily: "'Space Grotesk', sans-serif"
-                            }}
-                        >
-                            {mode}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Compact Visualizer */}
-                <div style={{ height: vizMode === "circle" ? 110 : 70, position: "relative", opacity: state.isPlaying ? 1 : 0.4, transition: "opacity 0.5s" }}>
-                    <AudioVisualizer
-                        width={300}
-                        height={vizMode === "circle" ? 110 : 70}
-                        style={vizMode}
-                        className="w-full h-full"
-                    />
-                </div>
-
-                {/* Track Info */}
-                {currentTrack ? (
-                    <div style={{ textAlign: "center", animation: "fade-up 0.5s ease" }}>
-                        <p style={{ color: "var(--gold)", fontSize: "0.65rem", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: "0.4rem" }}>
-                            {currentTrack.artist}
-                        </p>
-                        <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", color: "var(--text-primary)", letterSpacing: "0.05em", lineHeight: 1.1 }}>
-                            {currentTrack.title}
-                        </h3>
-                        <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginTop: "0.4rem", letterSpacing: "0.05em" }}>
-                            {currentTrack.album} · {currentTrack.year}
-                        </p>
+            {!isLarge && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", background: "rgba(12,12,12,0.4)", padding: "1.5rem", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.05)" }}>
+                    {/* Visualizer Mode Controls */}
+                    <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", position: "relative", zIndex: 50 }}>
+                        {(["bars", "wave", "circle"] as const).map((mode) => (
+                            <button
+                                key={mode}
+                                onClick={() => {
+                                    console.log("viz mode clicked:", mode);
+                                    setVizMode(mode);
+                                }}
+                                style={{
+                                    background: vizMode === mode ? "rgba(201, 168, 76, 0.2)" : "transparent",
+                                    border: `1px solid ${vizMode === mode ? "rgba(201, 168, 76, 0.4)" : "rgba(201, 168, 76, 0.1)"}`,
+                                    color: vizMode === mode ? "var(--gold)" : "var(--text-muted)",
+                                    padding: "0.25rem 0.75rem",
+                                    fontSize: "0.6rem",
+                                    letterSpacing: "0.2em",
+                                    textTransform: "uppercase",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s",
+                                    borderRadius: "2px",
+                                    fontFamily: "'Space Grotesk', sans-serif"
+                                }}
+                            >
+                                {mode}
+                            </button>
+                        ))}
                     </div>
-                ) : (
-                    <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", padding: "1rem" }}>
-                        SELECT A TRACK
-                    </div>
-                )}
-            </div>
+
+                    {/* Compact Visualizer */}
+                    {vizMode !== "circle" && (
+                        <div style={{ height: 70, position: "relative", opacity: state.isPlaying ? 1 : 0.4, transition: "opacity 0.5s" }}>
+                            <AudioVisualizer
+                                width={300}
+                                height={70}
+                                style={vizMode}
+                                className="w-full h-full"
+                            />
+                        </div>
+                    )}
+
+                    {/* Track Info */}
+                    {currentTrack ? (
+                        <div style={{ textAlign: "center", animation: "fade-up 0.5s ease" }}>
+                            <p style={{ color: "var(--gold)", fontSize: "0.65rem", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: "0.4rem" }}>
+                                {currentTrack.artist}
+                            </p>
+                            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", color: "var(--text-primary)", letterSpacing: "0.05em", lineHeight: 1.1 }}>
+                                {currentTrack.title}
+                            </h3>
+                            <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginTop: "0.4rem", letterSpacing: "0.05em" }}>
+                                {currentTrack.album} · {currentTrack.year}
+                            </p>
+                        </div>
+                    ) : (
+                        <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", padding: "1rem" }}>
+                            SELECT A TRACK
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

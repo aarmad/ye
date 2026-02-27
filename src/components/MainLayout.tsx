@@ -184,7 +184,11 @@ export default function MainLayout() {
                             {label}
                         </button>
                     ))}
-                    <button onClick={() => { setSidebarTab("playlists"); setSidebarOpen(true); }} style={{
+                    <button onClick={() => {
+                        setSidebarTab("playlists");
+                        setSidebarOpen(true);
+                        setRightView("library");
+                    }} style={{
                         background: "transparent", border: "none", color: "var(--text-muted)",
                         fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.65rem",
                         letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer",
@@ -229,26 +233,34 @@ export default function MainLayout() {
 
                 {/* ====== CENTER: VINYL + CONTROLS ====== */}
                 <div style={{
-                    flex: "0 0 320px", display: "flex", flexDirection: "column",
+                    flex: rightView === "album-tracks" ? "0 0 50vw" : "0 0 320px",
+                    marginLeft: rightView === "album-tracks" ? "-20vw" : "0",
+                    display: "flex", flexDirection: "column",
                     borderRight: "1px solid rgba(201,168,76,0.08)",
-                    background: "rgba(10, 10, 10, 0.6)",
-                    padding: "1.25rem", gap: "1.25rem", overflow: "hidden",
+                    background: rightView === "album-tracks" ? "transparent" : "rgba(10, 10, 10, 0.6)",
+                    padding: rightView === "album-tracks" ? "0" : "1.25rem", gap: "1.25rem", overflow: "visible",
+                    transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                    zIndex: 10
                 }}>
                     <div style={{ flex: 1, minHeight: 0 }}>
-                        <VinylDisplay />
+                        <VinylDisplay isLarge={rightView === "album-tracks"} />
                     </div>
-                    <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", flexShrink: 0 }} />
-                    <div style={{ flexShrink: 0 }}>
-                        <PlayerControls />
-                    </div>
+                    {rightView !== "album-tracks" && (
+                        <>
+                            <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", flexShrink: 0 }} />
+                            <div style={{ flexShrink: 0 }}>
+                                <PlayerControls />
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* ====== RIGHT PANEL ====== */}
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", paddingLeft: rightView === "album-tracks" ? "2vw" : "0", transition: "padding 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
                     {/* Header */}
                     <div style={{
-                        padding: "1rem 2rem 0.75rem",
-                        borderBottom: "1px solid rgba(201,168,76,0.06)",
+                        padding: rightView === "album-tracks" ? "2.5rem 2rem 1rem" : "1rem 2rem 0.75rem",
+                        borderBottom: rightView === "album-tracks" ? "none" : "1px solid rgba(201,168,76,0.06)",
                         flexShrink: 0,
                     }}>
                         <div style={{ display: "flex", alignItems: "flex-end", gap: "1rem", flexWrap: "wrap" }}>
@@ -278,12 +290,24 @@ export default function MainLayout() {
                             )}
 
                             <div style={{ flex: 1, minWidth: 0 }}>
+                                {rightView === "album-tracks" && activeAlbum && (
+                                    <h1 style={{
+                                        fontFamily: "'Bebas Neue', sans-serif",
+                                        fontSize: "clamp(3rem, 10vw, 8rem)",
+                                        lineHeight: 0.85,
+                                        letterSpacing: "0.02em",
+                                        margin: "0 0 1rem 0",
+                                        color: "var(--text-primary)",
+                                        textShadow: "0 4px 20px rgba(0,0,0,0.5)"
+                                    }}>
+                                        {activeAlbum.artist.toUpperCase()}
+                                    </h1>
+                                )}
                                 <h2 style={{
                                     fontFamily: "'Bebas Neue', sans-serif",
-                                    fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                                    fontSize: rightView === "album-tracks" ? "clamp(1.5rem, 3vw, 2.5rem)" : "clamp(2rem, 4vw, 3.5rem)",
                                     letterSpacing: "0.05em",
-                                    background: "linear-gradient(135deg, var(--text-primary) 0%, rgba(245,240,232,0.4) 100%)",
-                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                                    color: rightView === "album-tracks" ? "var(--text-secondary)" : "var(--text-primary)",
                                     lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                                 }}>
                                     {pageTitle}
@@ -375,6 +399,12 @@ export default function MainLayout() {
                             <TrackList />
                         )}
                     </div>
+                    {/* Render PlayerControls at the bottom of the right panel if in album-tracks view */}
+                    {rightView === "album-tracks" && (
+                        <div style={{ padding: "1rem 2rem 2rem", borderTop: "1px solid rgba(201,168,76,0.06)", flexShrink: 0, background: "rgba(10,10,10,0.4)" }}>
+                            <PlayerControls />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
