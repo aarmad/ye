@@ -5,11 +5,13 @@ export const metadata: Metadata = {
   title: "YE — Music Player",
   description: "An immersive music player inspired by the visual universe of Kanye West. Dark, luxurious, futuristic.",
   keywords: ["Kanye West", "music player", "ye", "hip-hop", "luxury"],
-  authors: [{ name: "YE Player" }],
   openGraph: {
     title: "YE — Music Player",
     description: "Immersive music experience",
     type: "music.song",
+  },
+  icons: {
+    icon: "/favicon.svg",
   },
 };
 

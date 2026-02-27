@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#080808" />
+  
+  <!-- Outer glowing circle -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#C9A84C" stroke-width="8" opacity="0.3" />
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#E8C97A" stroke-width="4" opacity="0.1" />
+
+  <!-- Y -->
+  <path d="M 180 180 L 256 280 L 332 180" fill="none" stroke="#E8C97A" stroke-width="45" stroke-linecap="square" stroke-linejoin="miter" />
+  <path d="M 256 280 L 256 380" fill="none" stroke="#E8C97A" stroke-width="45" stroke-linecap="square" stroke-linejoin="miter" />
+
+  <!-- E -->
+  <path d="M 360 215 L 420 215 M 360 280 L 410 280 M 360 345 L 420 345" fill="none" stroke="#E8C97A" stroke-width="40" stroke-linecap="square" stroke-linejoin="miter" opacity="0" />
+  
+  <!-- YE Text / Logo alternative -->
+  <text x="50%" y="54%" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="200" fill="#C9A84C" text-anchor="middle" dominant-baseline="middle" letter-spacing="10">YE</text>
+  
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8C97A" />
+      <stop offset="50%" stop-color="#C9A84C" />
+      <stop offset="100%" stop-color="#8B6914" />
+    </linearGradient>
+  </defs>
+</svg>

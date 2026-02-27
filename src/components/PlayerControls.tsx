@@ -72,6 +72,8 @@ export default function PlayerControls() {
                 display: "flex",
                 flexDirection: "column",
                 gap: "1.25rem",
+                position: "relative",
+                zIndex: 100,
             }}
         >
             {/* Track info */}
