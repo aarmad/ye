@@ -91,8 +91,11 @@ export default function AudioVisualizer({
             let x = 0;
 
             for (let i = 0; i < bufferLength; i++) {
-                const v = dataArray[i] / 128.0;
-                const y = (v * h) / 2;
+                // Get the normalized wave value (-1 to 1)
+                const v = (dataArray[i] / 128.0) - 1.0;
+                // Amplify the wave significantly and center it
+                const y = (h / 2) + v * h * 1.5;
+
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
                 x += sliceWidth;
@@ -117,23 +120,25 @@ export default function AudioVisualizer({
 
             const centerX = w / 2;
             const centerY = h / 2;
-            const radius = Math.min(w, h) / 3;
+            // Make base radius larger so it escapes the vinyl cover
+            const radius = Math.min(w, h) / 2.3;
 
             for (let i = 0; i < bufferLength; i++) {
-                const value = dataArray[i] / 255;
+                // Amplify circle data
+                const value = Math.min(1, (dataArray[i] / 255) * 1.2);
                 const angle = (i / bufferLength) * Math.PI * 2;
-                const barLen = value * radius * 0.8;
+                const barLen = value * radius * 0.4; // Max extrusion
 
                 const x1 = centerX + Math.cos(angle) * radius;
                 const y1 = centerY + Math.sin(angle) * radius;
                 const x2 = centerX + Math.cos(angle) * (radius + barLen);
                 const y2 = centerY + Math.sin(angle) * (radius + barLen);
 
-                const alpha = 0.3 + value * 0.7;
+                const alpha = 0.2 + value * 0.8;
                 ctx.strokeStyle = `rgba(201, 168, 76, ${alpha})`;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3; // Make it a bit more visible
                 ctx.shadowColor = "rgba(201, 168, 76, 0.6)";
-                ctx.shadowBlur = 5 * value;
+                ctx.shadowBlur = 8 * value;
 
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
