@@ -210,7 +210,7 @@ export default function VinylDisplay() {
             }}
         >
             {/* Main Vinyl Area */}
-            <div style={{ flex: "1 1 0", minHeight: "380px", position: "relative" }}>
+            <div style={{ flex: "1 1 0", minHeight: "200px", position: "relative" }}>
                 <VinylRecord
                     isPlaying={state.isPlaying}
                     coverArt={currentTrack?.coverArt}
@@ -265,25 +265,6 @@ export default function VinylDisplay() {
                         </div>
                     )}
                 </div>
-
-                {/* Track Info */}
-                {currentTrack ? (
-                    <div style={{ textAlign: "center", animation: "fade-up 0.5s ease" }}>
-                        <p style={{ color: "var(--gold)", fontSize: "0.65rem", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: "0.4rem" }}>
-                            {currentTrack.artist}
-                        </p>
-                        <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", color: "var(--text-primary)", letterSpacing: "0.05em", lineHeight: 1.1 }}>
-                            {currentTrack.title}
-                        </h3>
-                        <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginTop: "0.4rem", letterSpacing: "0.05em" }}>
-                            {currentTrack.album} · {currentTrack.year}
-                        </p>
-                    </div>
-                ) : (
-                    <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", padding: "1rem" }}>
-                        SELECT A TRACK
-                    </div>
-                )}
             </div>
         </div>
     );
