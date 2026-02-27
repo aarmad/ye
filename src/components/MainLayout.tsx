@@ -57,7 +57,7 @@ type RightView = "library" | "albums" | "album-tracks";
 
 export default function MainLayout() {
     const { state, dispatch, loadLibrary, playTrack } = useAudio();
-    const [sidebarTab, setSidebarTab] = useState<"playlists" | "upload">("upload");
+    const [sidebarTab, setSidebarTab] = useState<"playlists" | "upload">("playlists");
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [rightView, setRightView] = useState<RightView>("albums");
     const [mounted, setMounted] = useState(false);

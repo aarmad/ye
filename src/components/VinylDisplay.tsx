@@ -40,7 +40,7 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                     aspectRatio: "1/1",
                     maxWidth: "360px",
                     borderRadius: "50%",
-                    background: "#050505",
+                    background: coverArt ? `url('${coverArt}') center/cover no-repeat` : "#050505",
                     boxShadow: `
                         0 20px 80px rgba(0,0,0,0.95),
                         0 0 0 1px rgba(201, 168, 76, 0.1),
@@ -59,10 +59,10 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                     borderRadius: "50%",
                     background: `repeating-radial-gradient(
                         circle at center,
-                        #111 0,
-                        #111 1px,
-                        #080808 2px,
-                        #080808 4px
+                        rgba(0,0,0,0.3) 0,
+                        rgba(0,0,0,0.3) 1px,
+                        rgba(0,0,0,0.5) 2px,
+                        rgba(0,0,0,0.6) 4px
                     )`,
                 }} />
 
@@ -74,10 +74,10 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                     background: `conic-gradient(
                         from 0deg, 
                         transparent 0%, 
-                        rgba(255,255,255,0.03) 10%, 
+                        rgba(255,255,255,0.05) 10%, 
                         transparent 20%, 
                         transparent 45%, 
-                        rgba(255,255,255,0.03) 55%, 
+                        rgba(255,255,255,0.05) 55%, 
                         transparent 65%, 
                         transparent 100%
                     )`,
@@ -91,50 +91,44 @@ function VinylRecord({ isPlaying, coverArt, title, trackNumber }: { isPlaying: b
                         top: "50%",
                         left: "68%",
                         transform: "translateY(-50%)",
-                        color: "rgba(255,255,255,0.45)",
+                        color: "rgba(255,255,255,0.7)",
                         fontFamily: "'Inter', sans-serif",
                         fontSize: "0.6rem",
                         letterSpacing: "0.1em",
                         textTransform: "uppercase",
-                        fontWeight: 600,
+                        fontWeight: 700,
                         pointerEvents: "none",
                         whiteSpace: "nowrap",
-                        textShadow: "0 1px 2px rgba(0,0,0,0.5)"
+                        textShadow: "0 1px 4px rgba(0,0,0,0.9)"
                     }}>
-                        <span style={{ marginRight: "0.4rem", color: "rgba(201,168,76,0.5)" }}>
+                        <span style={{ marginRight: "0.4rem", color: "rgba(201,168,76,0.8)" }}>
                             {trackNumber ? String(trackNumber).padStart(2, '0') + '.' : ''}
                         </span>
                         {title}
                     </div>
                 )}
 
-                {/* Center Label */}
+                {/* Center Spindle Hole Only */}
                 <div
                     style={{
                         position: "relative",
-                        width: "35%",
-                        height: "35%",
+                        width: "5%",
+                        height: "5%",
                         borderRadius: "50%",
-                        background: coverArt ? `url(${coverArt}) center/cover no-repeat` : "var(--surface-3)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        boxShadow: "0 0 50px rgba(0,0,0,1)",
-                        zIndex: 2,
+                        background: "#020202",
+                        border: "1px solid rgba(255,255,255,0.05)",
+                        boxShadow: "0 0 10px rgba(0,0,0,0.8), inset 0 0 5px rgba(0,0,0,1)",
+                        zIndex: 5,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                     }}
                 >
-                    {!coverArt && <Disc size={40} color="rgba(201,168,76,0.2)" />}
-
-                    {/* Spindle hole shadow */}
                     <div style={{
-                        width: "15%",
-                        height: "15%",
+                        width: "30%",
+                        height: "30%",
                         borderRadius: "50%",
-                        background: "#020202",
-                        boxShadow: "inset 0 0 15px rgba(0,0,0,1)",
-                        zIndex: 3,
-                        border: "1px solid rgba(255,255,255,0.05)"
+                        background: "rgba(201,168,76,0.4)"
                     }} />
                 </div>
             </div>
@@ -221,11 +215,14 @@ export default function VinylDisplay() {
             {/* Visualizer & Info Section */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", background: "rgba(12,12,12,0.4)", padding: "1.5rem", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.05)" }}>
                 {/* Visualizer Mode Controls */}
-                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", position: "relative", zIndex: 50 }}>
                     {(["bars", "wave", "circle"] as const).map((mode) => (
                         <button
                             key={mode}
-                            onClick={() => setVizMode(mode)}
+                            onClick={() => {
+                                console.log("viz mode clicked:", mode);
+                                setVizMode(mode);
+                            }}
                             style={{
                                 background: vizMode === mode ? "rgba(201, 168, 76, 0.2)" : "transparent",
                                 border: `1px solid ${vizMode === mode ? "rgba(201, 168, 76, 0.4)" : "rgba(201, 168, 76, 0.1)"}`,
