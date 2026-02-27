@@ -185,17 +185,23 @@ export default function MainLayout() {
                         </button>
                     ))}
                     <button onClick={() => {
-                        setSidebarTab("playlists");
-                        setSidebarOpen(true);
-                        setRightView("library");
+                        if (sidebarOpen && sidebarTab === "playlists") {
+                            setSidebarOpen(false);
+                        } else {
+                            setSidebarTab("playlists");
+                            setSidebarOpen(true);
+                        }
                     }} style={{
-                        background: "transparent", border: "none", color: "var(--text-muted)",
+                        background: "transparent", border: "none",
+                        color: (sidebarOpen && sidebarTab === "playlists") ? "var(--gold)" : "var(--text-muted)",
                         fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.65rem",
                         letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer",
                         transition: "color 0.2s", padding: 0,
+                        borderBottom: (sidebarOpen && sidebarTab === "playlists") ? "1px solid var(--gold)" : "1px solid transparent",
+                        paddingBottom: "2px",
                     }}
                         onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--gold)")}
-                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = (sidebarOpen && sidebarTab === "playlists") ? "var(--gold)" : "var(--text-muted)")}
                     >
                         PLAYLISTS
                     </button>
@@ -233,34 +239,26 @@ export default function MainLayout() {
 
                 {/* ====== CENTER: VINYL + CONTROLS ====== */}
                 <div style={{
-                    flex: rightView === "album-tracks" ? "0 0 50vw" : "0 0 320px",
-                    marginLeft: rightView === "album-tracks" ? "-20vw" : "0",
-                    display: "flex", flexDirection: "column",
+                    flex: "0 0 320px", display: "flex", flexDirection: "column",
                     borderRight: "1px solid rgba(201,168,76,0.08)",
-                    background: rightView === "album-tracks" ? "transparent" : "rgba(10, 10, 10, 0.6)",
-                    padding: rightView === "album-tracks" ? "0" : "1.25rem", gap: "1.25rem", overflow: "visible",
-                    transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                    zIndex: 10
+                    background: "rgba(10, 10, 10, 0.6)",
+                    padding: "1.25rem", gap: "1.25rem", overflow: "hidden",
                 }}>
                     <div style={{ flex: 1, minHeight: 0 }}>
-                        <VinylDisplay isLarge={rightView === "album-tracks"} />
+                        <VinylDisplay />
                     </div>
-                    {rightView !== "album-tracks" && (
-                        <>
-                            <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", flexShrink: 0 }} />
-                            <div style={{ flexShrink: 0 }}>
-                                <PlayerControls />
-                            </div>
-                        </>
-                    )}
+                    <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)", flexShrink: 0 }} />
+                    <div style={{ flexShrink: 0 }}>
+                        <PlayerControls />
+                    </div>
                 </div>
 
                 {/* ====== RIGHT PANEL ====== */}
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", paddingLeft: rightView === "album-tracks" ? "2vw" : "0", transition: "padding 0.5s cubic-bezier(0.4, 0, 0.2, 1)" }}>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                     {/* Header */}
                     <div style={{
-                        padding: rightView === "album-tracks" ? "2.5rem 2rem 1rem" : "1rem 2rem 0.75rem",
-                        borderBottom: rightView === "album-tracks" ? "none" : "1px solid rgba(201,168,76,0.06)",
+                        padding: "1rem 2rem 0.75rem",
+                        borderBottom: "1px solid rgba(201,168,76,0.06)",
                         flexShrink: 0,
                     }}>
                         <div style={{ display: "flex", alignItems: "flex-end", gap: "1rem", flexWrap: "wrap" }}>
@@ -290,24 +288,12 @@ export default function MainLayout() {
                             )}
 
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                {rightView === "album-tracks" && activeAlbum && (
-                                    <h1 style={{
-                                        fontFamily: "'Bebas Neue', sans-serif",
-                                        fontSize: "clamp(3rem, 10vw, 8rem)",
-                                        lineHeight: 0.85,
-                                        letterSpacing: "0.02em",
-                                        margin: "0 0 1rem 0",
-                                        color: "var(--text-primary)",
-                                        textShadow: "0 4px 20px rgba(0,0,0,0.5)"
-                                    }}>
-                                        {activeAlbum.artist.toUpperCase()}
-                                    </h1>
-                                )}
                                 <h2 style={{
                                     fontFamily: "'Bebas Neue', sans-serif",
-                                    fontSize: rightView === "album-tracks" ? "clamp(1.5rem, 3vw, 2.5rem)" : "clamp(2rem, 4vw, 3.5rem)",
+                                    fontSize: "clamp(2rem, 4vw, 3.5rem)",
                                     letterSpacing: "0.05em",
-                                    color: rightView === "album-tracks" ? "var(--text-secondary)" : "var(--text-primary)",
+                                    background: "linear-gradient(135deg, var(--text-primary) 0%, rgba(245,240,232,0.4) 100%)",
+                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                                     lineHeight: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                                 }}>
                                     {pageTitle}
@@ -399,12 +385,6 @@ export default function MainLayout() {
                             <TrackList />
                         )}
                     </div>
-                    {/* Render PlayerControls at the bottom of the right panel if in album-tracks view */}
-                    {rightView === "album-tracks" && (
-                        <div style={{ padding: "1rem 2rem 2rem", borderTop: "1px solid rgba(201,168,76,0.06)", flexShrink: 0, background: "rgba(10,10,10,0.4)" }}>
-                            <PlayerControls />
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
